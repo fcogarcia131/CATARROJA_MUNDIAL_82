@@ -355,8 +355,32 @@
     <p class="note" id="note"></p>
     <section class="report" aria-labelledby="report-title">
       <div class="report-head">
-        <h2 id="report-title">Informe de lecturas</h2><label>Parámetro del informe<select id="reportMetric"
-            aria-label="Parámetro del informe"></select></label>
+        <h2 id="report-title">Informe de lecturas</h2>
+       <label>
+        Parámetro del informe
+        <select id="reportMetric"
+            aria-label="Parámetro del informe">
+        </select>
+       </label>
+       
+       <label>
+  Responsable
+  <select id="reportResp"
+          aria-label="Responsable del registro">
+    <option value="Todos">Todos</option>
+  </select>
+</label>
+
+       <label>
+  Desde
+  <input type="date" id="fechaDesde">
+</label>
+
+<label>
+  Hasta
+  <input type="date" id="fechaHasta">
+</label>
+       
       </div>
      
    
@@ -501,16 +525,47 @@ let incidencias = [];
     }
 
     function render() {
-      let m = $('metric').value, z = $('zone').value; const esTexto = metricasTexto.includes(m); $('reportMetric').value = m; const from = $('fromDate')?.value || '';
+      let m = $('metric').value, 
+       z = $('zone').value; 
+     const esTexto = metricasTexto.includes(m);
+     $('reportMetric').value = m; 
+     const from = $('fromDate')?.value || '';
       const to = $('toDate')?.value || '';
+
+     const respInforme =
+ $('reportResp')?.value || 'Todos';
+
+const desdeInforme =
+ $('fechaDesde')?.value || '';
+
+const hastaInforme =
+ $('fechaHasta')?.value || '';
 
       let pts = data.filter(x => {
         if (key(x.metric) !== key(m)) return false;
         if (z !== 'Todas las zonas' && key(x.zone) !== key(z)) return false;
         if (from && x.date < from) return false;
         if (to && x.date > to) return false;
-        return true;
-      }).sort((a, b) => a.date.localeCompare(b.date));
+
+        if (
+    respInforme !== 'Todos' &&
+    x.responsible !== respInforme
+  ) return false;
+
+  if (
+    desdeInforme &&
+    x.date < desdeInforme
+  ) return false;
+
+  if (
+    hastaInforme &&
+    x.date > hastaInforme
+  ) return false;
+
+  return true;
+})
+
+     }).sort((a, b) => a.date.localeCompare(b.date));
 
       if (esTexto) {
 
@@ -626,10 +681,30 @@ if(responsableFiltro !== 'Todos'){
       }); 
      if (!data.length) throw Error('sin datos'); 
      options(); $('metric').onchange = render; 
+
+     const responsablesInforme = [
+  ...new Set(
+    data
+      .map(x => x.responsible)
+      .filter(r => r && r.trim() !== '')
+  )
+].sort();
+
+$('reportResp').innerHTML =
+  '<option value="Todos">Todos</option>' +
+  responsablesInforme
+    .map(r => `<option>${r}</option>`)
+    .join('');
+     
      $('reportMetric').onchange = () => {$('metric').value = $('reportMetric').value; 
      render()}; $('zone').onchange = render; 
      $('fromDate').onchange = render; 
      $('toDate').onchange = render; 
+
+     $('reportResp').onchange = render;
+     $('fechaDesde').onchange = render;
+     $('fechaHasta').onchange = render;
+     
      window.addEventListener('resize', render); render()
      
   fetch(sourceIncidencias)
