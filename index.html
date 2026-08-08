@@ -511,7 +511,55 @@ const hastaInforme =
         return;
       }
 
-      if (!pts.length) {$('status').hidden = false; $('status').textContent = 'No hay lecturas para esta combinación.'; $('chart').hidden = true; $('reportRows').innerHTML = ''; return } $('status').hidden = true; $('chart').hidden = false; let series = pts.map(p => ({date: p.date, value: p.value, out: outOfRange(p), element: p.element, responsible: p.responsible})); let vals = series.map(x => x.value), min = Math.min(...vals), max = Math.max(...vals), pad = (max - min || 1) * .14, lo = min - pad, hi = max + pad; let W = 700, H = 330, L = 64, R = 26, T = 25, B = 58, iw = W - L - R, ih = H - T - B, x = i => L + (series.length === 1 ? iw / 2 : i * iw / (series.length - 1)), y = v => T + (hi - v) * ih / (hi - lo); $('total').textContent = pts.length; $('period').textContent = `${dateLabel(series[0].date)}–${dateLabel(series.at(-1).date)}`; $('latest').textContent = fmt(series.at(-1).value); $('latest').classList.toggle('alert', series.at(-1).out); $('detail').textContent = `${dateLabel(series.at(-1).date)} · ${m}`; let grid = [0, .25, .5, .75, 1].map(t => lo + (hi - lo) * t).map(v => `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="#d7e2e8"/><text x="${L - 8}" y="${y(v) + 4}" text-anchor="end" fill="#5e7180" font-size="12">${fmt(v)}</text>`).join(''); let path = series.map((p, i) => `${i ? 'L' : 'M'} ${x(i)} ${y(p.value)}`).join(' '), dots = series.map((p, i) => `<circle data-i="${i}" cx="${x(i)}" cy="${y(p.value)}" r="4" fill="${p.out ? '#e98678' : '#087f8c'}" tabindex="0"><title>${dateLabel(p.date)}: ${fmt(p.value)}${p.out ? ' · fuera de rango' : ''}</title></circle>`).join(''), maxLabels = Math.max(3, Math.floor(($('chart').clientWidth || 700) / 70)), step = Math.max(1, Math.ceil((series.length - 1) / (maxLabels - 1))), labels = series.map((p, i) => i % step === 0 || i === series.length - 1 ? `<text x="${x(i)}" y="${H - 28}" text-anchor="middle" fill="#5e7180" font-size="11">${dateLabel(p.date)}</text>` : '').join(''); $('chart').innerHTML = `<title>${m}: evolución temporal</title>${grid}<path d="${path}" fill="none" stroke="#087f8c" stroke-width="2.5"/>${dots}${labels}<text x="${L}" y="16" fill="#172a3a" font-size="13">${m}</text>`; $('note').textContent = 'Salmón: valor fuera del límite paramétrico.';
+      if (!pts.length) {$('status').hidden = false; 
+      $('status').textContent = 'No hay lecturas para esta combinación.';
+      $('chart').hidden = true; $('reportRows').innerHTML = '';
+   return } $('status').hidden = true; $('chart').hidden = false; 
+     let series = pts.map(p => ({date: p.date, value: p.value, out: outOfRange(p), element: p.element, responsible: p.responsible}));
+     let vals = series.map(x => x.value), min = Math.min(...vals), max = Math.max(...vals), pad = (max - min || 1) * .14, lo = min - pad, hi = max + pad; 
+     let W = 700, H = 330, L = 64, R = 26, T = 25, B = 58, iw = W - L - R, ih = H - T - B, x = i => L + (series.length === 1 ? iw / 2 : i * iw / (series.length - 1)), y = v => T + (hi - v) * ih / (hi - lo); 
+     $('total').textContent = pts.length; $('period').textContent = `${dateLabel(series[0].date)}–${dateLabel(series.at(-1).date)}`; 
+     $('latest').textContent = fmt(series.at(-1).value); 
+     $('latest').classList.toggle('alert', series.at(-1).out); $('detail').textContent = `${dateLabel(series.at(-1).date)} · ${m}`;
+     let grid = [0, .25, .5, .75, 1].map(t => lo + (hi - lo) * t).map(v => `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="#d7e2e8"/><text x="${L - 8}" y="${y(v) + 4}" text-anchor="end" fill="#5e7180" font-size="12">${fmt(v)}</text>`).join(''); 
+let path = series
+    .map((p, i) => `${i ? 'L' : 'M'} ${x(i)} ${y(p.value)}`)
+    .join(' ');
+
+let dots = series
+    .map((p, i) =>
+        `<circle data-i="${i}" cx="${x(i)}" cy="${y(p.value)}"
+        r="4"
+        fill="${p.out ? '#e98678' : '#087f8c'}"
+        tabindex="0">
+        <title>${dateLabel(p.date)}: ${fmt(p.value)}</title>
+        </circle>`
+    ).join('');
+
+const ancho = $('chart').clientWidth || 700;
+const maxLabels = Math.max(4, Math.floor(ancho / 110));
+const step = Math.ceil(series.length / maxLabels);
+
+let labels = series.map((p, i) => {
+
+    if (i % step !== 0 && i !== series.length - 1)
+        return '';
+
+    return `
+        <text
+            x="${x(i)}"
+            y="${H - 28}"
+            text-anchor="middle"
+            fill="#5e7180"
+            font-size="11">
+            ${dateLabel(p.date)}
+        </text>`;
+
+}).join('');
+
+
+
+     
       const fromText = from || 'Inicio';
       const toText = to || 'Actualidad';
       $('printFilters').innerHTML = `Parámetro: ${m} | Zona: ${z} | Desde: ${fromText} | Hasta: ${toText}`;
