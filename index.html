@@ -347,6 +347,11 @@
         background: white;
       }
 
+     #toggleIncidencias,
+#incidenciasBox{
+    display:none !important;
+}
+
       .controls,
       .btn-print {
         display: none;
@@ -473,8 +478,22 @@
       </div>
     </section>
    
-<section class="report" id="incidenciasBox">
-  <div class="report-head">
+<button
+  id="toggleIncidencias"
+  class="btn-print"
+  type="button"
+  style="margin-top:20px;">
+  ⚠️ Mostrar incidencias
+</button>
+
+<section
+  class="report"
+  id="incidenciasBox"
+  style="display:none;">
+
+   
+   
+   <div class="report-head">
     <h2>⚠️ Incidencias y acciones correctoras</h2>
    
    
@@ -835,6 +854,28 @@ $('incResponsable').onchange = renderIncidencias;
   .catch(err => console.log(err));
      
     }).catch(() => {$('status').textContent = 'No se han podido cargar los datos. Comprueba que la hoja de cálculo sigue publicada.'});
+
+const btnInc = document.getElementById('toggleIncidencias');
+const boxInc = document.getElementById('incidenciasBox');
+
+btnInc.addEventListener('click', () => {
+
+    const visible = boxInc.style.display !== 'none';
+
+    if (visible) {
+
+        boxInc.style.display = 'none';
+        btnInc.textContent = '⚠️ Mostrar incidencias';
+
+    } else {
+
+        boxInc.style.display = 'block';
+        btnInc.textContent = 'Ocultar incidencias';
+
+    }
+
+});
+   
   </script>
 </body>
 
