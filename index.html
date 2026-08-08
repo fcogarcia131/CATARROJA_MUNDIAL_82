@@ -537,7 +537,7 @@ let dots = series
     ).join('');
 
 const ancho = $('chart').clientWidth || 700;
-const maxLabels = Math.max(4, Math.floor(ancho / 110));
+const maxLabels = Math.max(4, Math.floor(ancho / 95));
 const step = Math.ceil(series.length / maxLabels);
 
 let labels = series.map((p, i) => {
@@ -557,7 +557,7 @@ let labels = series.map((p, i) => {
 
 }).join('');
 
-
+$('chart').innerHTML = `<title>${m}: evolución temporal</title>${grid}<path d="${path}" fill="none" stroke="#087f8c" stroke-width="2.5"/>${dots}${labels}<text x="${L}" y="16" fill="#172a3a" font-size="13">${m}</text>`;
 
      
       const fromText = from || 'Inicio';
