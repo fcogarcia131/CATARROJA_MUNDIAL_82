@@ -208,54 +208,72 @@
 
    /* ===== TABLA DE INCIDENCIAS ===== */
 
-
 #incTable{
     width:100%;
     table-layout:fixed;
-    border-collapse:collapse;
 }
 
 #incTable th,
 #incTable td{
-    padding:6px 8px;
+    padding:8px 6px;
     vertical-align:top;
+    font-size:.88rem;
 }
 
+/* ID */
 #incTable th:nth-child(1),
 #incTable td:nth-child(1){
-    width:55px;
+    width:6%;
+    white-space:nowrap;
 }
 
+/* Fecha */
 #incTable th:nth-child(2),
 #incTable td:nth-child(2){
-    width:75px;
+    width:9%;
+    white-space:nowrap;
 }
 
+/* Elemento */
 #incTable th:nth-child(3),
 #incTable td:nth-child(3){
-    width:180px;
+    width:24%;
+    white-space:normal;
+    overflow-wrap:anywhere;
+    word-break:break-word;
 }
 
+/* Valor detectado */
 #incTable th:nth-child(4),
 #incTable td:nth-child(4){
-    width:60px;
+    width:8%;
     text-align:center;
     white-space:nowrap;
 }
 
+/* Incidencia */
 #incTable th:nth-child(5),
 #incTable td:nth-child(5){
-    width:170px;
+    width:18%;
+    white-space:normal;
+    overflow-wrap:anywhere;
+    word-break:break-word;
 }
 
+/* Responsable */
 #incTable th:nth-child(6),
 #incTable td:nth-child(6){
-    width:170px;
+    width:20%;
+    white-space:normal;
+    overflow-wrap:anywhere;
+    word-break:break-word;
 }
 
+/* Estado */
 #incTable th:nth-child(7),
 #incTable td:nth-child(7){
-    width:80px;
+    width:9%;
+    white-space:nowrap;
 }
 
 
