@@ -208,65 +208,56 @@
 
    /* ===== TABLA DE INCIDENCIAS ===== */
 
-#incidenciasBox table{
+
+#incTable{
     width:100%;
     table-layout:fixed;
     border-collapse:collapse;
 }
 
-#incidenciasBox th,
-#incidenciasBox td{
-    padding:8px 6px;
-    word-break:break-word;
+#incTable th,
+#incTable td{
+    padding:6px 8px;
     vertical-align:top;
 }
 
-/* ID */
-#incidenciasBox th:nth-child(1),
-#incidenciasBox td:nth-child(1){
-    width:6%;
+#incTable th:nth-child(1),
+#incTable td:nth-child(1){
+    width:55px;
 }
 
-/* Fecha */
-#incidenciasBox th:nth-child(2),
-#incidenciasBox td:nth-child(2){
-    width:8%;
+#incTable th:nth-child(2),
+#incTable td:nth-child(2){
+    width:75px;
 }
 
-/* Elemento */
-#incidenciasBox th:nth-child(3),
-#incidenciasBox td:nth-child(3){
-    width:25%;
+#incTable th:nth-child(3),
+#incTable td:nth-child(3){
+    width:180px;
 }
 
-/* VALOR DETECTADO */
-#incBody td:nth-child(4),
-#incBody th:nth-child(4){
-    width:70px;
-    min-width:70px;
-    max-width:70px;
-    text-align:center;
-}
-
-/* Incidencia */
-#incidenciasBox th:nth-child(5),
-#incidenciasBox td:nth-child(5){
-    width:22%;
-}
-
-/* Responsable */
-#incidenciasBox th:nth-child(6),
-#incidenciasBox td:nth-child(6){
-    width:25%;
-}
-
-/* Estado */
-#incidenciasBox th:nth-child(7),
-#incidenciasBox td:nth-child(7){
-    width:12%;
+#incTable th:nth-child(4),
+#incTable td:nth-child(4){
+    width:60px;
     text-align:center;
     white-space:nowrap;
 }
+
+#incTable th:nth-child(5),
+#incTable td:nth-child(5){
+    width:170px;
+}
+
+#incTable th:nth-child(6),
+#incTable td:nth-child(6){
+    width:170px;
+}
+
+#incTable th:nth-child(7),
+#incTable td:nth-child(7){
+    width:80px;
+}
+
 
     @media(max-width:620px) {
       main {
@@ -507,7 +498,7 @@ Responsable
  
  
    <div class="table-wrap">
-    <table>
+   <table id="incTable" style="table-layout:fixed;width:100%">
       <thead>
         <tr>
           <th>ID</th>
