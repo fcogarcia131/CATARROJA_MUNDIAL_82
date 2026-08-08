@@ -205,6 +205,68 @@
       white-space: nowrap
     }
 
+
+   /* ===== TABLA DE INCIDENCIAS ===== */
+
+#incidenciasBox table{
+    width:100%;
+    table-layout:fixed;
+    border-collapse:collapse;
+}
+
+#incidenciasBox th,
+#incidenciasBox td{
+    padding:8px 6px;
+    word-break:break-word;
+    vertical-align:top;
+}
+
+/* ID */
+#incidenciasBox th:nth-child(1),
+#incidenciasBox td:nth-child(1){
+    width:6%;
+}
+
+/* Fecha */
+#incidenciasBox th:nth-child(2),
+#incidenciasBox td:nth-child(2){
+    width:8%;
+}
+
+/* Elemento */
+#incidenciasBox th:nth-child(3),
+#incidenciasBox td:nth-child(3){
+    width:25%;
+}
+
+/* VALOR DETECTADO */
+#incidenciasBox th:nth-child(4),
+#incidenciasBox td:nth-child(4){
+    width:6%;
+    text-align:center;
+    white-space:nowrap;
+}
+
+/* Incidencia */
+#incidenciasBox th:nth-child(5),
+#incidenciasBox td:nth-child(5){
+    width:18%;
+}
+
+/* Responsable */
+#incidenciasBox th:nth-child(6),
+#incidenciasBox td:nth-child(6){
+    width:25%;
+}
+
+/* Estado */
+#incidenciasBox th:nth-child(7),
+#incidenciasBox td:nth-child(7){
+    width:12%;
+    text-align:center;
+    white-space:nowrap;
+}
+
     @media(max-width:620px) {
       main {
         padding: 18px 12px
