@@ -1,5 +1,5 @@
-<!-- WEB ALIMENTADA CON CSV PUBLICADO RESPUESTAS DE FORMULARIO 1 OP MENORES NOMBRE CLIENTE EN LINEA 302
- URL DEL CSV DE LA PESTAÑA "DATOS" EN LINEA 364 -->
+<!-- WEB ALIMENTADA CON CSV PUBLICADO RESPUESTAS DE FORMULARIO 1 OP MENORES NOMBRE CLIENTE EN LINEA 309
+ URL DEL CSV DE LA PESTAÑA "DATOS" EN LINEA 409 -->
 
 <!doctype html>
 <html lang="es">
@@ -7,7 +7,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Operaciones menores legionella · CAMPO DE FUTBOL MUNDIAL 82, CATARROJA</title>
+  <!-- <title>Operaciones menores legionella · MUNDIAL 82 CATARROJA, AGUA SANITARIA</title> -->
   <style>
     :root {
       --bg: #f5f8fa;
@@ -43,10 +43,13 @@
       margin: 0 0 4px
     }
 
-    header p {
-      margin: 0 0 24px;
-      color: var(--muted)
-    }
+    /* TITULO INSTALACION */   
+   header p {
+  margin: 6px 0 24px;
+  color: var(--ink);
+  font-size: 1.3rem;
+  font-weight: 500;
+}
 
     .stats {
       display: grid;
@@ -300,11 +303,10 @@
 <body>
   <main>
 
-    <!--<header><h1>OPERACIONES MENORES PARA LA PREVENCION DE LA LEGIONELLA</h1><p>Instalación Catarroja Mundial 82, agua sanitaria fría y caliente</p></header> -->
 
     <header>
       <h1>OPERACIONES MENORES PARA LA PREVENCION DE LA LEGIONELLA</h1>
-      <p>Instalación MUNDIAL82, CATARROJA, agua sanitaria fría y caliente</p>
+      <p>MUNDIAL 82 Catarroja,  AFCSCH</p>
 
       <button onclick="window.print()" class="btn-print">
         📄 Exportar informe PDF
@@ -355,6 +357,14 @@
        </label>
        
        <label>
+  Elemento
+  <select id="reportElement"
+          aria-label="Elemento revisado">
+    <option value="Todos">Todos</option>
+  </select>
+</label>
+
+</label>
   Responsable
   <select id="reportResp"
           aria-label="Responsable del registro">
@@ -396,7 +406,7 @@
    
   </main>
   <script>
-    const source='https://docs.google.com/spreadsheets/d/e/2PACX-1vRR0zXeaD3_kNR0twc8r9cMJ2Tve6zdrs3jg4edg2k8bR1nIN1p6aYU_5B4YV-CrDA-zhB4MXCf7i4B/pub?gid=647157156&single=true&output=csv';
+    const source='https://docs.google.com/spreadsheets/d/e/2PACX-1vRR0zXeaD3_kNR0twc8r9cMJ2Tve6zdrs3jg4edg2k8bR1nIN1p6aYU_5B4YV-CrDA-zhB4MXCf7i4B/pub?gid=647157156&single=true&output=csv'
     //datos//
   
 
@@ -465,6 +475,9 @@
      const respInforme =
  $('reportResp')?.value || 'Todos';
 
+ const elementoInforme =
+$('reportElement')?.value || 'Todos';
+
 const desdeInforme =
  $('fechaDesde')?.value || '';
 
@@ -477,6 +490,12 @@ const hastaInforme =
         if (from && x.date < from) return false;
         if (to && x.date > to) return false;
 
+        if (
+          elementoInforme !== 'Todos' &&
+          x.element !== elementoInforme
+          ) return false;
+
+       
         if (
     respInforme !== 'Todos' &&
     x.responsible !== respInforme
@@ -613,6 +632,26 @@ $('chart').innerHTML = `<title>${m}: evolución temporal</title>${grid}<path d="
      if (!data.length) throw Error('sin datos'); 
      options(); $('metric').onchange = render; 
 
+const elementosInforme = [
+  ...new Set(
+    data
+      .map(x => x.element)
+      .filter(e => e && e.trim() !== '')
+  )
+].sort();
+
+$('reportElement').innerHTML =
+  '<option value="Todos">Todos</option>' +
+  elementosInforme
+    .map(e => `<option>${e}</option>`)
+    .join('');
+
+
+
+
+
+
+
      const responsablesInforme = [
   ...new Set(
     data
@@ -632,6 +671,7 @@ $('reportResp').innerHTML =
      $('fromDate').onchange = render; 
      $('toDate').onchange = render; 
 
+     $('reportElement').onchange = render;
      $('reportResp').onchange = render;
      $('fechaDesde').onchange = render;
      $('fechaHasta').onchange = render;
