@@ -34,7 +34,7 @@
     main {
       max-width: 1180px;
       margin: 0 auto;
-      padding: 28px 32px 40px
+      padding: 28px 32px 40px;
      box-sizing: border-box;
     }
 
@@ -364,7 +364,7 @@
   </select>
 </label>
 
-</label>
+<label>
   Responsable
   <select id="reportResp"
           aria-label="Responsable del registro">
@@ -439,8 +439,22 @@
     const $ = id => document.getElementById(id), fmt = v => Number(v.toFixed(2)).toLocaleString('es-ES'), key = s => String(s || '').trim().toLocaleLowerCase('es-ES');
     let data = [];
     function csv(text) {let rows = [], row = [], cell = '', q = false; for (let i = 0; i < text.length; i++) {let c = text[i], n = text[i + 1]; if (c === '"' && q && n === '"') {cell += '"'; i++} else if (c === '"') q = !q; else if (c === ',' && !q) {row.push(cell); cell = ''} else if ((c === '\n' || c === '\r') && !q) {if (c === '\r' && n === '\n') i++; row.push(cell); if (row.some(x => x)) rows.push(row); row = []; cell = ''} else cell += c} if (cell || row.length) {row.push(cell); rows.push(row)} return rows}
-    function iso(s) {let p = String(s || '').trim().split('/'); return p.length === 3 ? `${p[2]}-${p[1].padStart(2, '0')}-${p[0].padStart(2, '0')}` : ''}
-    function number(s) {let v = String(s || '').trim().replace('.', '').replace(',', '.'); return v === '' ? null : Number(v)} function dateLabel(s) {return new Date(s + 'T00:00:00').toLocaleDateString('es-ES', {day: '2-digit', month: 'short'})} function dateFull(s) {return new Date(s + 'T00:00:00').toLocaleDateString('es-ES')} function escapeHtml(s) {return String(s || '—').replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]))}
+    // Acepta "10/11/2026" y también "10/11/2026 12:30:00" (con hora)
+    function iso(s) {let m = String(s || '').trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/); return m ? `${m[3]}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}` : ''}
+    // Convierte a número admitiendo "60", "60,5", "60.5", "60 ºC", "60º", "1.234,5"...
+    // Devuelve null si la celda no contiene un número válido.
+    function number(s) {
+      let v = String(s || '').trim().replace(/[^\d,.\-]/g, '');
+      if (!/\d/.test(v)) return null;
+      if (v.includes(',') && v.includes('.')) {
+        // El último separador es el decimal; el otro es de miles
+        v = v.lastIndexOf(',') > v.lastIndexOf('.') ? v.replace(/\./g, '').replace(',', '.') : v.replace(/,/g, '');
+      } else {
+        v = v.replace(',', '.');
+      }
+      const n = Number(v);
+      return Number.isFinite(n) ? n : null;
+    } function dateLabel(s) {return new Date(s + 'T00:00:00').toLocaleDateString('es-ES', {day: '2-digit', month: 'short'})} function dateFull(s) {return new Date(s + 'T00:00:00').toLocaleDateString('es-ES')} function escapeHtml(s) {return String(s || '—').replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]))}
     function options() {let metrics = [...new Set(data.map(x => x.metric))], zones = [...new Set(data.map(x => x.zone))], metricOptions = metrics.map(x => `<option>${x}</option>`).join(''); $('metric').innerHTML = metricOptions; $('reportMetric').innerHTML = metricOptions; $('zone').innerHTML = '<option>Todas las zonas</option>' + zones.map(x => `<option>${x}</option>`).join(''); $('metric').value = metrics.includes('Temperatura acumulador') ? 'Temperatura acumulador' : metrics[0]; $('reportMetric').value = $('metric').value}
     function outOfRange(p) {let l = limits[p.metric]; return !!l && ((l.min !== undefined && p.value < l.min) || (l.max !== undefined && p.value > l.max))}
 
@@ -456,7 +470,7 @@
 <tr>
 <td>${dateFull(p.date)}</td>
 <td>${escapeHtml(p.element)}</td>
-<td>${esTexto ? escapeHtml(p.raw) : fmt(p.value)}</td>
+<td>${esTexto || !Number.isFinite(p.value) ? escapeHtml(p.raw) : fmt(p.value)}</td>
 <td>${escapeHtml(p.responsible)}</td>
 </tr>
 
@@ -514,6 +528,15 @@ const hastaInforme =
   return true;
      }).sort((a, b) => a.date.localeCompare(b.date));
 
+      // Registros sin valor numérico (p. ej. "Apagado"): van a la tabla, no a la gráfica
+      const tabla = pts;
+      const malos = esTexto ? [] : pts.filter(p => !Number.isFinite(p.value));
+      if (!esTexto) pts = pts.filter(p => Number.isFinite(p.value));
+      $('note').textContent = malos.length
+        ? `${malos.length} registro(s) sin valor numérico no se dibujan en la gráfica (sí aparecen en la tabla): ` +
+          malos.slice(0, 5).map(x => `${dateFull(x.date)} → "${x.raw}"`).join(' · ') + (malos.length > 5 ? ' …' : '')
+        : '';
+
       if (esTexto) {
 
         $('chart').hidden = true;
@@ -541,7 +564,7 @@ const hastaInforme =
 
       if (!pts.length) {$('status').hidden = false; 
       $('status').textContent = 'No hay lecturas para esta combinación.';
-      $('chart').hidden = true; $('reportRows').innerHTML = '';
+      $('chart').hidden = true; report(tabla);
    return } $('status').hidden = true; $('chart').hidden = false; 
      let series = pts.map(p => ({date: p.date, value: p.value, out: outOfRange(p), element: p.element, responsible: p.responsible}));
      let vals = series.map(x => x.value), min = Math.min(...vals), max = Math.max(...vals), pad = (max - min || 1) * .14, lo = min - pad, hi = max + pad; 
@@ -598,7 +621,7 @@ $('chart').innerHTML = `<title>${m}: evolución temporal</title>${grid}<path d="
       const fromText = from || 'Inicio';
       const toText = to || 'Actualidad';
       $('printFilters').innerHTML = `Parámetro: ${m} | Zona: ${z} | Desde: ${fromText} | Hasta: ${toText}`;
-      report(pts); $('chart').querySelectorAll('circle').forEach(el => {let show = () => {let p = series[+el.dataset.i], tip = $('tip'); tip.hidden = false; tip.textContent = `${dateFull(p.date)} | ${p.element} | ${fmt(p.value)}${p.out ? ' | FUERA DE RANGO' : ''}`; tip.style.left = `${(+el.getAttribute('cx') / 700) * 100}%`; tip.style.top = `${(+el.getAttribute('cy') / 330) * 100}%`}; el.onmouseenter = show; el.onfocus = show; el.onmouseleave = () => $('tip').hidden = true; el.onblur = () => $('tip').hidden = true})
+      report(tabla); $('chart').querySelectorAll('circle').forEach(el => {let show = () => {let p = series[+el.dataset.i], tip = $('tip'); tip.hidden = false; tip.textContent = `${dateFull(p.date)} | ${p.element} | ${fmt(p.value)}${p.out ? ' | FUERA DE RANGO' : ''}`; tip.style.left = `${(+el.getAttribute('cx') / 700) * 100}%`; tip.style.top = `${(+el.getAttribute('cy') / 330) * 100}%`}; el.onmouseenter = show; el.onfocus = show; el.onmouseleave = () => $('tip').hidden = true; el.onblur = () => $('tip').hidden = true})
     }
 
    
@@ -620,15 +643,15 @@ $('chart').innerHTML = `<title>${m}: evolución temporal</title>${grid}<path d="
         }))
 
 
-          .filter(x =>
-            x.date &&
-            x.zone &&
-            (
-              x.raw !== '' ||
-              Number.isFinite(x.value)
-            )
-          )
-      }); 
+          .filter(x => {
+            if (!x.date || !x.zone || String(x.raw || '').trim() === '') return false;
+            // Parámetros de texto (purgas, limpieza): basta con que haya algo escrito
+            if (metricasTexto.includes(x.metric)) return true;
+            // Parámetros numéricos: se guardan siempre; los que no son número
+            // (p. ej. "Apagado") salen en la tabla pero no en la gráfica
+            return true;
+          })
+      });
      if (!data.length) throw Error('sin datos'); 
      options(); $('metric').onchange = render; 
 
